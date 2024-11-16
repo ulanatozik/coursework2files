@@ -11,7 +11,7 @@
 //  mycoursework
 //
 //  Created by Ульяна Тозик on 15.09.24.
-//
+///
 
 #ifndef ACCOUNTSWORK_H
 #define ACCOUNTSWORK_H
