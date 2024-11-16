@@ -36,7 +36,7 @@ bool EnterSystem::checkLoginAndPassword(const std::vector<std::shared_ptr<User>>
     auto accounts = fileObj.readAccountsFromFile();
     for (const auto& account : accounts) {
         if (account->getLogin() == login && account->getPassword() == password) {
-            std::cout << "Добро пожаловать, " << account->getLogin() << "! Ваша заявка на регистрацию." << std::endl;
+            std::cout << "Добро пожаловать, " << account->getLogin() << "! К сожалению, ваша заявка на регистрацию еще не подтверждена, поэтому вы не можете зайти в систему." << std::endl;
 
             // Предоставляем доступ к меню независимо от статуса заявки
             // Здесь вы можете добавить логику для пользователя с неподтвержденной заявкой
@@ -239,14 +239,14 @@ void WorkWithAccounts::deleteAccount() const { // удалить аккаунт
          << "Ваш выбор:" << endl;
     yes_or_no = checker.inputNumber(1, 2);
     
-    if(yes_or_no == 1) {
-        if(users.at(number_for_delete - 1)->getIsAdmin() == 1) { // Используем -> для доступа к методу
+     if(yes_or_no == 1) {
+        /*if(users.at(number_for_delete - 1)->getIsAdmin() == 1) { // Используем -> для доступа к методу
             cout << "Удалить свой аккаунт невозможно" << endl;
-        } else {
+        } else {*/
             users.erase(users.begin() + number_for_delete - 1);
             cout << "----Аккаунт успешно удален----" << endl;
             filesObj.writeUsersToFile(users); // Предполагается, что writeUsersToFile принимает std::vector<std::shared_ptr<User>>
-        }
+        
     } else {
         cout << "Вы отменили удаление" << endl;
     }
