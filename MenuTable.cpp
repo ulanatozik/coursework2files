@@ -37,12 +37,13 @@ void Menu::startMenu() const { // начальное меню
     } while(choice != 3);
 }
 
-void Menu::menuWorkWithUser() const { // меню для работы с учетными записями
+void Menu::menuWorkWithUser() const { // передаем текущего пользователя
     int choice;
     Tables tableObj;
     WorkWithAccounts accountObj;
     WorkWithFiles filesObj;
     ProgrammChecks checker;
+    
     do {
         cout << "--------------Введите--------------" << endl;
         
@@ -69,11 +70,12 @@ void Menu::menuWorkWithUser() const { // меню для работы с уче�
             accountObj.editAccount();
             break;
         case 4:
+            // Передаем текущего пользователя в метод удаления
             accountObj.deleteAccount();
             break;
         case 5:
             accountObj.approve();
-            break; // Не забываем break здесь
+            break;
         case 6:
             break;
         default:
@@ -81,6 +83,7 @@ void Menu::menuWorkWithUser() const { // меню для работы с уче�
         }
     } while(choice != 6);
 }
+
 
 void Menu::menuWorkWithFurnitureStart() const {
     // Создаем объект WorkWithProducts один раз, а не на каждом вызове.
@@ -270,7 +273,6 @@ void Menu::menuUser() const { // меню пользователя
 }
 
 void Menu::menuService() const {
-    SearchProducts searchObj;
     WorkWithFiles filesObj;
     ProgrammChecks checker;
     WorkWithServices serObj;
@@ -377,7 +379,7 @@ void Menu::menuSort() const { // Меню сортировки
     tableObj.printFurnitureTable(furniture_temp); // Передаем vector<Furniture>
 }
 
-void Menu::menuAdministrator() const { // Меню администратора
+void Menu::menuAdministrator() const { // передаем текущего пользователя
     ProgrammChecks checker;
     int choice;
 
@@ -401,7 +403,8 @@ void Menu::menuAdministrator() const { // Меню администратора
         
         switch(choice) {
         case 1:
-            menuWorkWithUser(); // Если это виртуальный метод, может потребоваться добавить const
+            // Передаем текущего пользователя в menuWorkWithUser
+            menuWorkWithUser();
             break;
         case 2:
             menuWorkWithFurnitureStart(); // Аналогично
@@ -411,6 +414,7 @@ void Menu::menuAdministrator() const { // Меню администратора
         }
     } while(choice != 3);
 }
+
 
 void Tables::printAccountsTable(const vector<shared_ptr<User>>& accounts) const { // Вывод таблицы аккаунтов
     EnterSystem sObj;
