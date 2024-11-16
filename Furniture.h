@@ -198,7 +198,7 @@ public:
 
     // Переопределение метода для получения новой цены с учетом кастомизации
     double getPrice() const override {
-        double additionalCost = 50.0;  // Например, кастомизация стоит 50 единиц
+        double additionalCost = 50.0;  /// Например, кастомизация стоит 50 единиц
         return Furniture::getPrice() + additionalCost;
     }
 };
