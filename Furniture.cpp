@@ -438,7 +438,7 @@ void WorkWithProducts::generateReport() {
     report << "Общие затраты на закупку товаров: " << totalCost << " руб.\n";
     report << "Прибыль от продаж (с учетом расходов): " << totalProfit << " руб.\n";
 
-    // Сохранение отчета в файл
+    /// Сохранение отчета в файл
     string filename = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/sales_report.txt";
     ofstream reportFile(filename, ios::out);
     if (reportFile.is_open()) {
