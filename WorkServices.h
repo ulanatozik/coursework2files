@@ -40,4 +40,18 @@ public:
     void editExistingServices() const;
 };
 
-#endif // Header_h//
+struct Order {
+    string type;       // Тип заказа (например, "индивидуальный", "перетяжка", "ремонт")
+    string client;     // Имя клиента
+    string phone;      // Телефон клиента
+    string address;    // Адрес клиента
+    string details;    // Детали заказа
+    int quantity;      // Количество
+
+    // Для сортировки заказов по типу
+    bool operator<(const Order& other) const {
+        return type < other.type;
+    }
+};
+
+#endif // Header_h
