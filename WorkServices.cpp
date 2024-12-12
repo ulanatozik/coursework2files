@@ -16,45 +16,85 @@
 
 void WorkWithServices::displayServices() const {
     setlocale(LC_ALL, "ru_RU.UTF-8");
-    string filepath="/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/list_services2.txt";
+
+    string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Курсовая 1 семестр/курсовая код/coursework2/coursework2/list_services3.txt";
     ifstream ordersFile(filepath);
     if (!ordersFile) {
         cout << "Не удалось открыть файл заказов." << endl;
         return;
     }
 
-    cout << "\n|=========================================================================================================================================================|"
-         << "\n|                                       CПИСОК ЗАКАЗОВ УСЛУГ                                                                                              |"
-    << "\n|=========================================================================================================================================================|" << endl;
-    
+    vector<Order> orders;
     string line;
-    int i = 1;
 
+    // Чтение всех заказов из файла
     while (getline(ordersFile, line)) {
         istringstream ss(line);
-        string type, client, phone, address, details, quantity;
+        string type, client, phone, address, details, quantityStr;
+        int quantity = 0;
 
-       
-        getline(ss, type, ':');
-        getline(ss, client, ',');
+        // В зависимости от формата данных парсим нужную информацию
+        if (line.find("Индивидуальный заказ:") != string::npos) {
+            type = "Индивидуальный заказ";
+        } else if (line.find("Заказ на перетяжку:") != string::npos) {
+            type = "Перетяжка";
+        } else if (line.find("Заказ на ремонт:") != string::npos) {
+            type = "Ремонт";
+        }
+
+        // Получение данных клиента и прочего
+        getline(ss, client, ':');
         getline(ss, phone, ',');
         getline(ss, address, ',');
         getline(ss, details, ',');
-        getline(ss, quantity);
+        getline(ss, quantityStr);
 
-        cout << "| " << setw(2) << i++
-             << " | " << left << setw(17) << type
-             << " | " << left << setw(10) << client
-             << " | " << left << setw(12) << phone
-             << " | " << left << setw(18) << address
-             << " | " << left << setw(20) << details
-             << " | " << left << setw(10) << quantity << " |"
-             << "\n|---------------------------------------------------------------------------------------------------------------------------------------------------------|"
-             << endl;
+        // Обработка строки с количеством
+        try {
+            quantity = stoi(quantityStr);
+        } catch (const std::invalid_argument& e) {
+            cout << "Ошибка: некорректное количество в заказе: " << quantityStr << endl;
+            quantity = 0;  // Присваиваем дефолтное значение
+        } catch (const std::out_of_range& e) {
+            cout << "Ошибка: количество слишком большое: " << quantityStr << endl;
+            quantity = 0;  // Присваиваем дефолтное значение
+        }
+
+        orders.push_back({type, client, phone, address, details, quantity});
+    }
+
+    // Сортировка заказов по типу
+    sort(orders.begin(), orders.end());
+
+    // Вывод заголовка таблицы с корректными разделителями
+    cout << "| " << setw(15) << "Номер заказа"
+         << " | " << setw(20) << "Тип заказа"
+         << " | " << setw(20) << "Клиент"
+         << " | " << setw(15) << "Телефон"
+         << " | " << setw(25) << "Адрес"
+         << " | " << setw(25) << "Детали заказа"
+         << " | " << setw(12) << "Количество"
+         << " |" << endl;
+    cout << "|------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
+
+    // Вывод заказов
+    int i = 1;
+    for (const auto& order : orders) {
+        cout << "| " << setw(15) << i++
+             << " | " << setw(20) << order.type
+             << " | " << setw(20) << order.client
+             << " | " << setw(15) << order.phone
+             << " | " << setw(25) << order.address
+             << " | " << setw(25) << order.details
+             << " | " << setw(12) << order.quantity
+             << " |" << endl;
+        cout << "|------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
     }
 
     ordersFile.close();
 }
+
+
 
 void WorkWithServices::orderServiceIndividual() const {
     ProgrammChecks checker;
@@ -62,247 +102,163 @@ void WorkWithServices::orderServiceIndividual() const {
     cout << "--Индивидуальный заказ мебели--" << endl;
     cout << "Введите ваши предпочтения для индивидуального заказа:" << endl;
 
-    // Сбор информации о заказе
-    string clientName;
-    string clientPhone;
-    string clientAddress;
-    string productType;
-    string material;
-    string color;
+    string clientName, clientPhone, clientAddress, productType, material, color;
     int quantity;
 
-    // Считывание информации о заказе
     cout << "Введите ваше имя для оформления заказа: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cin.ignore();
     getline(cin, clientName);
 
     cout << "Введите ваш номер телефона: ";
     cin >> clientPhone;
 
     cout << "Введите ваш адрес: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cin.ignore();
     getline(cin, clientAddress);
 
-    cout << "Введите тип мебели (например, 'стол', 'стул', и т.д.): ";
+    cout << "Введите тип мебели: ";
     cin >> productType;
 
-    cout << "Введите материал (например, 'дерево', 'металл', и т.д.): ";
+    cout << "Введите материал: ";
     cin >> material;
 
-    cout << "Введите цвет (например, 'белый', 'черный', и т.д.): ";
+    cout << "Введите цвет: ";
     cin >> color;
 
     cout << "Введите количество: ";
-    quantity = checker.inputNumber(1, 100); // Ограничиваем количество
+    quantity = checker.inputNumber(1, 100);
 
-    // Запрос подтверждения на оформление заказа
-    cout << "Вы уверены, что хотите оформить индивидуальный заказ?" << endl;
-    cout << "1. Да" << endl;
-    cout << "2. Нет" << endl;
-    cout << "Ваш выбор: ";
-
+    cout << "Вы уверены, что хотите оформить индивидуальный заказ? (1 - Да, 2 - Нет): ";
     int choice;
     cin >> choice;
 
-    switch (choice) {
-        case 1: {
-            // Устанавливаем локаль для корректной работы с русскими символами
-            setlocale(LC_ALL, "ru_RU.UTF-8");
-
-            // Указываем путь к файлу
-            string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/list_services2.txt";
-            
-            // Открытие файла в режиме добавления
-            ofstream ordersFile(filepath, ios::app); // Открытие в режиме добавления
-            if (ordersFile.is_open()) {
-                // Запись информации о заказе в файл
-                ordersFile << "Индивидуальный заказ:" << endl;
-                ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
-                           << ", Адрес: " << clientAddress << ", Тип: " << productType
-                           << ", Материал: " << material << ", Цвет: " << color
-                           << ", Количество: " << quantity << endl;
-                ordersFile.close();
-                cout << "Ваш индивидуальный заказ оформлен. Ожидайте ответа администратора для подтверждения." << endl;
-                sleep(3);
-                cout << "Заказ принят. Мы свяжемся с вами для уточнения деталей." << endl;
-            } else {
-                cout << "Не удалось открыть файл для записи. Пожалуйста, проверьте путь и права доступа." << endl;
-            }
-            break;
+    if (choice == 1) {
+        setlocale(LC_ALL, "ru_RU.UTF-8");
+        string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Курсовая 1 семестр/курсовая код/coursework2/coursework2/list_services3.txt";
+        ofstream ordersFile(filepath, ios::app);
+        if (ordersFile.is_open()) {
+            ordersFile << "Индивидуальный заказ:" << endl;
+            ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
+                       << ", Адрес: " << clientAddress << ", Тип: " << productType
+                       << ", Материал: " << material << ", Цвет: " << color
+                       << ", Количество: " << quantity << endl;
+            ordersFile.close();
+            cout << "Ваш индивидуальный заказ оформлен." << endl;
+        } else {
+            cout << "Ошибка при записи в файл." << endl;
         }
-        case 2: {
-            cout << "Вы отменили индивидуальный заказ." << endl;
-            return;
-        }
-        default: {
-            cout << "Неверный выбор. Попробуйте снова." << endl;
-        }
+    } else {
+        cout << "Вы отменили заказ." << endl;
     }
 }
-
-
-
 
 void WorkWithServices::orderServiceRedo() const {
     ProgrammChecks checker;
 
     cout << "--Заказ на перетяжку мебели--" << endl;
 
-    // Сбор информации о заказе
-    string clientName;
-    string clientPhone;
-    string clientAddress;
-    string furnitureType;
-    string material;
+    string clientName, clientPhone, clientAddress, furnitureType, material;
     int quantity;
 
-    cout << "Введите ваше имя для оформления заказа: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cout << "Введите ваше имя: ";
+    cin.ignore();
     getline(cin, clientName);
-    
+
     cout << "Введите ваш номер телефона: ";
     cin >> clientPhone;
 
     cout << "Введите ваш адрес: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cin.ignore();
     getline(cin, clientAddress);
 
-    cout << "Введите тип мебели для перетяжки (например, 'стул', 'диван', и т.д.): ";
+    cout << "Введите тип мебели для перетяжки: ";
     cin >> furnitureType;
 
-    cout << "Введите желаемый материал для перетяжки (например, 'ткань', 'кожа', и т.д.): ";
+    cout << "Введите материал для перетяжки: ";
     cin >> material;
 
-    cout << "Введите количество предметов для перетяжки: ";
-    quantity = checker.inputNumber(1, 100); // Ограничиваем количество
+    cout << "Введите количество: ";
+    quantity = checker.inputNumber(1, 100);
 
-    cout << "Вы уверены, что хотите оформить заказ на перетяжку мебели?" << endl;
-    cout << "1. Да" << endl;
-    cout << "2. Нет" << endl;
-    cout << "Ваш выбор: ";
-
+    cout << "Вы уверены, что хотите оформить заказ на перетяжку мебели? (1 - Да, 2 - Нет): ";
     int choice;
     cin >> choice;
 
-    switch (choice) {
-        case 1: {
-            // Устанавливаем локаль для корректной записи символов
-            setlocale(LC_ALL, "ru_RU.UTF-8");
-            
-            // Указываем путь к файлу
-            string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/list_services2.txt";
-            
-            /// Открываем файл для записи
-            ofstream ordersFile(filepath, ios::app); // Открытие в режиме добавления
-            if (ordersFile.is_open()) {
-                // Записываем данные заказа в файл
-                ordersFile << "Заказ на перетяжку:" << endl;
-                ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
-                           << ", Адрес: " << clientAddress << ", Тип мебели: " << furnitureType
-                           << ", Материал: " << material << ", Количество: " << quantity << endl;
-                ordersFile.close();
-                cout << "Ваш заказ на перетяжку мебели оформлен. Ожидайте ответа администратора для подтверждения." << endl;
-                sleep(3);
-                cout << "Заказ принят. Мы свяжемся с вами для уточнения деталей." << endl;
-            } else {
-                cout << "Не удалось открыть файл для записи. Пожалуйста, проверьте путь и права доступа." << endl;
-            }
-
-            break;
+    if (choice == 1) {
+        setlocale(LC_ALL, "ru_RU.UTF-8");
+        string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Курсовая 1 семестр/курсовая код/coursework2/coursework2/list_services3.txt";
+        ofstream ordersFile(filepath, ios::app);
+        if (ordersFile.is_open()) {
+            ordersFile << "Заказ на перетяжку:" << endl;
+            ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
+                       << ", Адрес: " << clientAddress << ", Тип мебели: " << furnitureType
+                       << ", Материал: " << material << ", Количество: " << quantity << endl;
+            ordersFile.close();
+            cout << "Ваш заказ на перетяжку оформлен." << endl;
+        } else {
+            cout << "Ошибка при записи в файл." << endl;
         }
-        case 2: {
-            cout << "Вы отменили заказ на перетяжку мебели." << endl;
-            return;
-        }
-        default: {
-            cout << "Неверный выбор. Попробуйте снова." << endl;
-        }
+    } else {
+        cout << "Вы отменили заказ." << endl;
     }
 }
-
 
 void WorkWithServices::orderServiceFix() const {
     ProgrammChecks checker;
 
     cout << "--Заказ на ремонт мебели--" << endl;
 
-    // Сбор информации о заказе
-    string clientName;
-    string clientPhone;
-    string clientAddress;
-    string furnitureType;
-    string repairDetails;
+    string clientName, clientPhone, clientAddress, furnitureType, repairDetails;
     int quantity;
 
     cout << "Введите имя клиента: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cin.ignore();
     getline(cin, clientName);
-    
+
     cout << "Введите телефон клиента: ";
     cin >> clientPhone;
 
     cout << "Введите адрес клиента: ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cin.ignore();
     getline(cin, clientAddress);
 
-    cout << "Введите тип мебели для ремонта (например, 'стул', 'стол', 'шкаф', и т.д.): ";
+    cout << "Введите тип мебели для ремонта: ";
     cin >> furnitureType;
 
-    cout << "Опишите детали ремонта (например, 'замена ножек', 'покраска', 'сборка', и т.д.): ";
-    cin.ignore(); // Очистка буфера перед вводом строки
+    cout << "Опишите детали ремонта: ";
+    cin.ignore();
     getline(cin, repairDetails);
 
-    cout << "Введите количество предметов для ремонта: ";
-    quantity = checker.inputNumber(1, 100); // Ограничиваем количество
+    cout << "Введите количество: ";
+    quantity = checker.inputNumber(1, 100);
 
-    cout << "Вы уверены, что хотите оформить заказ на ремонт мебели?" << endl;
-    cout << "1. Да" << endl;
-    cout << "2. Нет" << endl;
-    cout << "Ваш выбор: ";
-
+    cout << "Вы уверены, что хотите оформить заказ на ремонт мебели? (1 - Да, 2 - Нет): ";
     int choice;
     cin >> choice;
 
-    switch (choice) {
-        case 1: {
-            // Устанавливаем локаль для корректной записи символов
-            setlocale(LC_ALL, "ru_RU.UTF-8");
-            
-            // Указываем путь к файлу
-            string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/list_services2.txt";
-            
-            // Открываем файл в режиме добавления
-            ofstream ordersFile(filepath, ios::app); // Открытие в режиме добавления
-            if (ordersFile.is_open()) {
-                // Записываем данные заказа в файл
-                ordersFile << "Заказ на ремонт:" << endl;
-                ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
-                           << ", Адрес: " << clientAddress << ", Тип мебели: " << furnitureType
-                           << ", Детали ремонта: " << repairDetails << ", Количество: " << quantity << endl;
-                ordersFile.close();
-                cout << "Ваш заказ на ремонт мебели оформлен. Ожидайте ответа администратора для подтверждения." << endl;
-                sleep(3);
-                cout << "Заказ принят. Мы свяжемся с вами для уточнения деталей." << endl;
-            } else {
-                // Если файл не открылся, выводим сообщение об ошибке
-                cout << "Не удалось открыть файл для записи. Пожалуйста, проверьте путь и права доступа." << endl;
-            }
-
-            break;
+    if (choice == 1) {
+        setlocale(LC_ALL, "ru_RU.UTF-8");
+        string filepath = "/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Курсовая 1 семестр/курсовая код/coursework2/coursework2/list_services3.txt";
+        ofstream ordersFile(filepath, ios::app);
+        if (ordersFile.is_open()) {
+            ordersFile << "Заказ на ремонт:" << endl;
+            ordersFile << "Имя клиента: " << clientName << ", Телефон: " << clientPhone
+                       << ", Адрес: " << clientAddress << ", Тип мебели: " << furnitureType
+                       << ", Детали ремонта: " << repairDetails << ", Количество: " << quantity << endl;
+            ordersFile.close();
+            cout << "Ваш заказ на ремонт оформлен." << endl;
+        } else {
+            cout << "Ошибка при записи в файл." << endl;
         }
-        case 2: {
-            cout << "Вы отменили заказ на ремонт мебели." << endl;
-            return;
-        }
-        default: {
-            cout << "Неверный выбор. Попробуйте снова." << endl;
-        }
+    } else {
+        cout << "Вы отменили заказ." << endl;
     }
 }
 
+
 void WorkWithServices::editExistingServices() const {
     setlocale(LC_ALL, "ru_RU.UTF-8");
-    string filepath="/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Кодик/mycoursework2/mycoursework2/list_services2.txt";
+    string filepath="/Users/ulanatozik/Материалы по учебе (БГУИР)/2 курс/Курсовая 1 семестр/курсовая код/coursework2/coursework2/list_services3.txt";
     ifstream ordersFile(filepath);
     if (!ordersFile) {
         cout << "Не удалось открыть файл заказов." << endl;
