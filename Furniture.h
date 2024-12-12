@@ -27,56 +27,40 @@
 #include <locale.h>
 #include <curses.h>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 
 
-class WorkWithProducts {
-private:
-    int totalSoldQuantity; // Общее количество проданных товаров
-    int totalRevenue;      // Общая выручка
-    std::vector<double> productCosts; // Вектор для хранения стоимости каждого товара
 
-public:
-    // Конструктор с инициализацией
-    WorkWithProducts()
-        : totalSoldQuantity(0), totalRevenue(0), productCosts() {} // Инициализация пустого вектора
+    // Класс для работы с товарами
+    class WorkWithProducts {
+    private:
+        int totalSoldQuantity; // Общее количество проданных товаров
+        int totalRevenue;      // Общая выручка
+        vector<double> productCosts; // Вектор для хранения стоимости каждого товара
 
-    void initializeProductCosts(const std::vector<double>& costs) {
-        productCosts = costs; // Инициализация затрат
-    }
+    public:
+        // Статические методы
+        static void initializeProductCosts(const std::vector<double>& costs);
+        static void initializeProductCosts();
+        void addFurniture();
+        static void deleteFurniture();
+        static void editFurniture();
+        static void printTotalRevenue();
+        static void generateReport();
+        static void printProfit();
+        static void orderProduct();
+        static void productNotification();
+        static void salesNotification();
+        static void inputCosts();
+        static void calculateSalesStatistics(int& outTotalSoldQuantity, int& outTotalRevenue);
+        static int getTotalSoldQuantity();
+        static int getTotalRevenue();
+        static int calculateTotalCost(); // Статический метод для расчета общих издержек
+    };
 
-
-    void initializeProductCosts() {
-        productCosts.clear();  // Очистка вектора
-    }
-
-    void addFurniture();
-    void deleteFurniture() const;
-    void editFurniture() const;
-
-    void printTotalRevenue();
-    void generateReport();
-    void printProfit();
-    void printProfit() const;
-    void orderProduct();
-    void productNotification() const;
-    void salesNotification() const;
-    
-    void inputCosts();
-
-    
-
-    void calculateSalesStatistics(int& outTotalSoldQuantity, int& outTotalRevenue) const;
-
-    int getTotalSoldQuantity() const;
-    int getTotalRevenue() const;
-   
-
-private:
-    int calculateTotalCost() const; // Объявление метода для расчета общих издержек
-};
-
+    // Класс для описания товара (мебели)
 class Furniture {
 private:
     string productType;
@@ -169,6 +153,7 @@ public:
     }
 };
 
+    // Класс для кастомной мебели
 class CustomFurniture : public Furniture {
 private:
     string fabricColor;  // Цвет ткани (для кастомизации)
@@ -203,4 +188,5 @@ public:
     }
 };
 
-#endif // Header_h
+
+#endif // HEADER_H
